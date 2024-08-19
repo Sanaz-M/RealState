@@ -50,23 +50,27 @@ export const login = async (req: Request, res: Response) => {
 
     //Generate cookie token and send to user
     const secretKey = process.env.JWT_SECRET_KEY;
-    console.log(secretKey);
     if (!secretKey) {
       throw new Error(
         "JWT_SECRET_KEY is not defined in the environment variables"
       );
     }
 
-    const {password:userPassword, ...userInfo} = user;
+    const { password: userPassword, ...userInfo } = user;
+
+    const age = 1000 * 60 * 60 * 24 * 7;
 
     const token = jwt.sign(
       {
         id: user.id,
+        isAdmin: true,
       },
-      secretKey
+      secretKey,
+      { expiresIn: age }
     );
 
-    res.cookie("token", token, {
+    res
+      .cookie("token", token, {
         httpOnly: true,
         // secure: true //Because we are in the development mode and using localhost can't use this
       })
